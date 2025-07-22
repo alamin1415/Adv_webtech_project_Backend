@@ -1,15 +1,20 @@
 			
 ├── src/
+|
 │   ├── main.ts
 │   ├── app.module.ts
-│
 │   ├── auth/                     # JWT Auth (Login, Signup, Roles)
 │   │   ├── auth.module.ts
 │   │   ├── auth.service.ts
 │   │   ├── auth.controller.ts
 │   │   ├── jwt.strategy.ts
 │   │   └── local.strategy.ts
-│
+|   |
+│   ├── employees/               # Laundry Store Staff/Managers
+│   │   ├── employees.module.ts
+│   │   ├── employees.service.ts
+│   │   ├── employees.controller.ts
+│   │   └── employee.entity.ts
 │   ├── users/                    # Customer + Admin Profiles
 │   │   ├── users.module.ts
 │   │   ├── users.service.ts
