@@ -9,4 +9,8 @@ export class AppController {
   getHello(): string {
     return this.appService.getHello();
   }
+  @Get('Photo')
+  getPhoto():string{
+    return this.appService.getPhoto();
+  }
 }
