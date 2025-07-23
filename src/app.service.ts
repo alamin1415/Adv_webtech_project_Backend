@@ -4,8 +4,9 @@ import { Injectable } from '@nestjs/common';
 export class AppService {
 
   getHello(): string {
-
-    return 'please start form here lets go bros ';
+services
+    return 'Welcome to Laundry Management API!';
  main
+
   }
 }
