@@ -1,3 +1,99 @@
+			
+├── src/
+|
+│   ├── main.ts
+│   ├── app.module.ts
+│   ├── auth/                     # JWT Auth (Login, Signup, Roles)
+│   │   ├── auth.module.ts
+│   │   ├── auth.service.ts
+│   │   ├── auth.controller.ts
+│   │   ├── jwt.strategy.ts
+│   │   └── local.strategy.ts
+|   |
+│   ├── employees/               # Laundry Store Staff/Managers
+│   │   ├── employees.module.ts
+│   │   ├── employees.service.ts
+│   │   ├── employees.controller.ts
+│   │   └── employee.entity.ts
+│   ├── users/                    # Customer + Admin Profiles
+│   │   ├── users.module.ts
+│   │   ├── users.service.ts
+│   │   ├── users.controller.ts
+│   │   └── user.entity.ts
+│
+│   ├── services/                 # Laundry services (Wash, Dry Clean, etc.)
+│   │   ├── services.module.ts
+│   │   ├── services.service.ts
+│   │   ├── services.controller.ts
+│   │   └── service.entity.ts
+│
+│   ├── pricing/                  # Dynamic Pricing for Items (Shirt, Sari, etc.)
+│   │   ├── pricing.module.ts
+│   │   ├── pricing.service.ts
+│   │   ├── pricing.controller.ts
+│   │   └── price.entity.ts
+│
+│   ├── subscriptions/           # Membership plans (e.g., Monthly Wash Pack)
+│   │   ├── subscriptions.module.ts
+│   │   ├── subscriptions.service.ts
+│   │   ├── subscriptions.controller.ts
+│   │   └── subscription.entity.ts
+│
+│   ├── orders/                  # Customer Orders with Items
+│   │   ├── orders.module.ts
+│   │   ├── orders.service.ts
+│   │   ├── orders.controller.ts
+│   │   ├── order.entity.ts
+│   │   └── order-item.entity.ts
+│
+│   ├── logistics/               # Pickup and Delivery Tracking
+│   │   ├── logistics.module.ts
+│   │   ├── logistics.service.ts
+│   │   ├── logistics.controller.ts
+│   │   └── logistic.entity.ts
+│
+│   ├── payments/                # Payment Gateway Integration (e.g., Razorpay)
+│   │   ├── payments.module.ts
+│   │   ├── payments.service.ts
+│   │   ├── payments.controller.ts
+│   │   └── payment.entity.ts
+│
+│   ├── feedback/                # Customer Reviews and Ratings
+│   │   ├── feedback.module.ts
+│   │   ├── feedback.service.ts
+│   │   ├── feedback.controller.ts
+│   │   └── feedback.entity.ts
+│
+│   ├── notifications/           # SMS/Email/Push Notifications
+│   │   ├── notifications.module.ts
+│   │   ├── notifications.service.ts
+│   │   ├── notifications.controller.ts
+│   │   └── notification.entity.ts
+│
+│   ├── branches/                # Multiple Store Locations
+│   │   ├── branches.module.ts
+│   │   ├── branches.service.ts
+│   │   ├── branches.controller.ts
+│   │   └── branch.entity.ts
+│
+│   ├── support/                 # Complaint or Issue Tracker
+│   │   ├── support.module.ts
+│   │   ├── support.service.ts
+│   │   ├── support.controller.ts
+│   │   └── support.entity.ts
+│
+├── config/                      # Environment and DB Configurations
+│   ├── typeorm.config.ts
+│   └── jwt.config.ts
+│
+├── .env                         # Env variables (DB, JWT, etc.)
+├── tsconfig.json
+├── nest-cli.json
+├── package.json
+└── README.md
+
+
+
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>
