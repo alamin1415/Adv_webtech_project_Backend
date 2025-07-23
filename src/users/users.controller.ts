@@ -54,6 +54,12 @@ export class userController {
      } 
 
 
+     addUser(@Body() user: any) {
+        this.userService.createUser(user);
+        return 'User added successfully';
+     }
+
+
      
    
 
