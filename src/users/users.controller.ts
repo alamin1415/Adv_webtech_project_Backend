@@ -25,11 +25,7 @@ export class userController {
 
     }
 
-//  @Get(':mobileNumber/:')
-// getUserByMobileNumber(@Param() params: { mobileNumber: string }) {
-//     console.log(params.mobileNumber);
-//     return this.userService.getUserByMobileNumber(+params.mobileNumber);
-// }
+
 
 @Get(':age')
 getUserByMobileNumber(@Param('age', ParseIntPipe) age:any) {
