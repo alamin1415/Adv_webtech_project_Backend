@@ -1,4 +1,4 @@
-import { Controller, Get, Param, ParseIntPipe, Post, Query,Body} from "@nestjs/common";
+import { Controller, Get, Param, ParseIntPipe, Post, Query } from "@nestjs/common";
 import { service } from "./users.service";
 
 
@@ -27,14 +27,11 @@ export class userController {
 
 
 
-@Get(':age')
-getUserByMobileNumber(@Param('age', ParseIntPipe) age:any) {
-    console.log(Param);
-    return this.userService.getUserByMobileNumber(age);
-}
-
-
-
+    @Get(':age')
+    getUserByMobileNumber(@Param('age', ParseIntPipe) age:any) {
+        console.log(Param);
+        return this.userService.getUserByMobileNumber(age);
+    }
 
 
 
