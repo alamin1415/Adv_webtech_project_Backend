@@ -2,8 +2,8 @@ export class Service {
   id: number;
   name: string;
   description: string;
-  category: string; // e.g., 'wash', 'dry-clean', 'iron', 'fold'
-  duration: number; // in minutes
+  category: string;
+  duration: number;
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
