@@ -4,12 +4,8 @@ import { Injectable } from '@nestjs/common';
 export class AppService {
 
   getHello(): string {
-    return 'Hello World! I am Shahed';
-  }
-  getPhoto():string{
-    return 'All Photo';
-  }
-  getPhotoById(photoid:number): string{
-    return 'Photo id  is '+ photoid;
+
+    return 'please start form here lets go bros ';
+ main
   }
 }
