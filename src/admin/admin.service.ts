@@ -9,8 +9,8 @@ getAdmin():string{
 getAdminByNameandID(name:string,id:number):object{
     return {name:name,id:id};
 }
-addAdmin(admindate:object):object{
-    return admindate;
+addAdmin(admindata:object):object{
+    return admindata;
 }
 
 }

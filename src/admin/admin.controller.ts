@@ -2,7 +2,7 @@ import {Controller, Get, Query, Post, Body} from '@nestjs/common';
 import {AdminService} from "./admin.service";
 
 @Controller('admin')
-export class AdminController{
+export class AdminController{ //class
 constructor(private readonly adminService:AdminService)
 {}
 
@@ -18,9 +18,9 @@ return this.adminService.getAdminByNameandID(name,id);
 }
 
 @Post('addadmin')
-addAdmin(@Body() admindate: object): object
+addAdmin(@Body() admindata: object): object
 {
-    return this.adminService.addAdmin(admindate);
+    return this.adminService.addAdmin(admindata);
 }
 
 }
