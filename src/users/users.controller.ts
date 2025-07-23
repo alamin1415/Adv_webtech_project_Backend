@@ -1,4 +1,4 @@
-import { Controller, Get, Param, ParseIntPipe, Post, Query } from "@nestjs/common";
+import { Controller, Get, Param, ParseIntPipe, Post, Query,Body} from "@nestjs/common";
 import { service } from "./users.service";
 
 
@@ -58,5 +58,24 @@ getUserByMobileNumber(@Param('age', ParseIntPipe) age:any) {
 
        
      return 'user created successfully';
-     }      
+     } 
+     
+    @Post('adduser')
+    adduser(@Body() user: {
+    mobileNumber: string;
+    name: string;
+    presentAddress: string;
+    pickupSchedule: string;
+    gender: string;
+    age: number;
+  }) {
+    const createdUser = this.userService.createUser(user);
+      data: createdUser
+    return ' add user successfully';
+
+  }
+
+
+   
+
 }
