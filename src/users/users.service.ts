@@ -49,9 +49,6 @@ export class service {
   }
 
 
-//   getUserByMobileNumber(mobileNumber: number) {
-//     return this.users.find(x => x.mobileNumber === mobileNumber);
-//    }
 
 getUserByMobileNumber(age: number) {
     return this.users.find(x => x.age === age);
