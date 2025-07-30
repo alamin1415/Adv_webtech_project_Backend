@@ -3,15 +3,22 @@ import { Injectable} from "@nestjs/common";
 @Injectable()
 export class AdminService{
 
-getAdmin():string{
-    return "All Admin";
-}
-getAdminByNameandID(name:string,id:number):object{
-    return {name:name,id:id};
-}
-addAdmin(admindata:object):object{
-    return admindata;
+    private admins:any[]= []; //in memory array
+
+getAdmin():object[] {
+    return this.admins;
 }
 
+addAdmin(admindata:object):object{
+   this.admins.push(admindata);
+   return {message: "Admin added" , admin:admindata};
+
+}
+getAdminByID(id:number):object{
+    const admin=this.admins.find((a) => a.id === id);
+    if(admin) return admin;
+    return {message: "Admin not found" };
+    
+}
 }
 
