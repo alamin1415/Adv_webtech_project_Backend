@@ -3,7 +3,7 @@ import { createCustomerDto } from './dtos/create_customer.dto';
 import { customerService } from './customer.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Multer,MulterError,diskStorage } from 'multer';
-
+ 
 
 @Controller('customer')
 export class CustomerController {
@@ -56,6 +56,7 @@ createCustomer(@Body(new ValidationPipe({whitelist:true})) customer: createCusto
 
         customer: customer,
 }
+
 
 
 
