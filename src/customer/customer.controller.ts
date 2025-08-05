@@ -1,25 +1,122 @@
-import { Controller, Get, Post, ValidationPipe,Body,UseInterceptors,UploadedFile} from '@nestjs/common';
+import { Delete,Controller, Get, Put,Post, ValidationPipe,Body,UseInterceptors,UploadedFile, Param, Patch} from '@nestjs/common';
 import { createCustomerDto } from './dtos/create_customer.dto';
 import { customerService } from './customer.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Multer,MulterError,diskStorage } from 'multer';
+import { UpdateCustomerDto } from './dtos/update_customer.dto';
  
+
+
+
 
 @Controller('customer')
 export class CustomerController {
 
     constructor(private  customer_service: customerService) {
 
-    }
+ }
+
+
+//working fine
+@Get(":id")
+getCustomerById(@Param("id") id: number) {
+    return this.customer_service.getCustomerById(+id);
+}
+
+
+//working fine
+@Post("addCustomer")
+createCustomer(@Body(new ValidationPipe({whitelist:true,transform:true})) customer: createCustomerDto  ) {
+     
+this.customer_service.createCustomer(customer);
+
+return "Customer created successfully";   
+
+}
+
+
+
+//working fine
+@Get()
+getAllCustomer()
+{
+
+return this.customer_service.getCustomerDetails();
+
+}
+
+
+
+
+
+@Put("UpdateCustomer")
+UpdateCustomerById()
+{
+
+    return "Customer are  successfully updated"; 
+}
+
+
+@Patch(":id")
+updateCustomerById(@Param("id") id: number, @Body(new ValidationPipe()) customer: UpdateCustomerDto) {
+//console.log(id, customer);
+
+    this.customer_service.updateCustomerById(+id, customer);
+return "Customer updated successfully";
+
+}
+
+
+// @Patch()
+// updateCustomerById(@Body(new ValidationPipe({whitelist:true,transform:true})) customer: UpdateCustomerDto) {
+// console.log( customer);
+// return "Customer updated successfully";
+
+// }
+
+
 
 
 
 @Get()
+TrackCustomerParcelById()
+{
+
+    return "Track All Customer Parcel successfully By Id";   
+}
+
+
+
+
+@Get("Details")
 getCustomerDetails()
 {
 
     return "Customer details retrieved successfully";   
 }
+
+
+// @Delete(":number")
+// deleteCustomerByNumber( @Param() number: number) {
+
+//     //console.log(number);
+
+//    return this.customer_service.deleteCustomerByNumber(number);
+
+// }
+
+
+// @Get(':number')
+// deleteCustomerByNumber( @Param("number") number: number,) {
+  
+
+//    //return this.customer_service.deleteCustomerById(id);
+
+// }
+
+
+
+
 
 
  @Post('profile_picture')
@@ -44,17 +141,12 @@ getCustomerDetails()
     return "File uploaded successfully";
  }
 
- 
 
-
-@Post("create")
-createCustomer(@Body(new ValidationPipe({whitelist:true})) customer: createCustomerDto  ) {
-     
-    return {
-    
-       message: "Customer created successfully_controller",
-
-        customer: customer,
+ @Delete(':id')
+deleteCustomerById(@Param('id') id: number) {
+    console.log(`Deleting customer with ID: ${id}`);
+  return this.customer_service.deleteCustomerById(+id);
+  
 }
 
 
@@ -64,8 +156,7 @@ createCustomer(@Body(new ValidationPipe({whitelist:true})) customer: createCusto
 
 
 
+}
 
-}
-}
 
 
