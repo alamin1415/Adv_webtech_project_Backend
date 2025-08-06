@@ -1,4 +1,4 @@
-import { Delete,Controller, Get, Put,Post, ValidationPipe,Body,UseInterceptors,UploadedFile, Param, Patch} from '@nestjs/common';
+import { Delete,Controller, Get, Put,Post, ValidationPipe,Body,UseInterceptors,UploadedFile, Param, Patch, ParseIntPipe} from '@nestjs/common';
 import { createCustomerDto } from './dtos/create_customer.dto';
 import { customerService } from './customer.service';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -17,11 +17,20 @@ export class CustomerController {
  }
 
 
+ @Get('null')
+  getCustomersWithNullFullName() {
+    return this.customer_service.getCustomersWithNullFullName();
+    //console.log("Fetching customers with null full name");
+  }
+
+
 //working fine
 @Get(":id")
-getCustomerById(@Param("id") id: number) {
-    return this.customer_service.getCustomerById(+id);
+getCustomerById(@Param("id",ParseIntPipe) id: number) {
+    return this.customer_service.getCustomerById(id);
 }
+
+
 
 
 //working fine
@@ -148,6 +157,9 @@ deleteCustomerById(@Param('id') id: number) {
   return this.customer_service.deleteCustomerById(+id);
   
 }
+
+
+
 
 
 

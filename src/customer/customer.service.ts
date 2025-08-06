@@ -1,5 +1,5 @@
 import {  Injectable, NotFoundException } from "@nestjs/common";
-import { Repository } from "typeorm";
+import { Repository ,IsNull} from "typeorm";
 import { Customer } from "./customer.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { createCustomerDto } from "./dtos/create_customer.dto";
@@ -71,6 +71,17 @@ async updateCustomerById(id: number, updateData: UpdateCustomerDto): Promise<str
   await this.customerRepo.delete(id);
 
   return `Customer with ID ${id} has been deleted successfully`;
+}
+
+
+async getCustomersWithNullFullName(): Promise<Customer[]> {
+  return await this.customerRepo.find({
+    where: [{
+      full_name: IsNull()},
+      { full_name: '' }]
+    
+  });
+
 }
 
 

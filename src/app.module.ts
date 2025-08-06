@@ -13,7 +13,7 @@ import { CustomerProfileModule } from './customer_profile/customer_profile.modul
     useFactory: () => ({
 
 
-     type: 'postgres',
+    type: 'postgres',
     entities: [Customer],
     synchronize: true,
     //autoLoadEntities: true,
