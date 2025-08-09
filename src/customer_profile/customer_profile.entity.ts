@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert } from "typeorm";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+} from "typeorm";
 
 @Entity()
 export class Customer_profile {
@@ -6,36 +13,32 @@ export class Customer_profile {
   id: number;
 
   @Column({ type: 'varchar', nullable: true })
-  full_name: string;
+  full_name?: string;
 
-  @Column()
-  email: string;
+  @Column({ type: 'varchar', nullable: true })
+  email?: string;
 
-  //  @Column()
-  //  phone: string;
-  @Column({ type: 'bigint', unsigned: true })
-  phone: number;
+  @Column({ type: 'varchar', nullable: true })
+  phone?: string;
 
-  @Column()
-  address: string;  
+  @Column({ type: 'varchar', nullable: true })
+  address?: string;
 
-  @Column()
-  password: string;
+  @Column({ type: 'varchar', nullable: true })
+  password?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   gender?: string;
 
-  @Column({ type: 'boolean', default: true })
-  isActive: boolean;
+  @Column({ type: 'boolean', nullable: true })
+  isActive?: boolean;
 
+  @CreateDateColumn({ type: 'timestamp' })
+  createdAt?: Date;
 
-  @Column({ unique: true })
-  customCode: string; // Your custom code stored here
+  @UpdateDateColumn({ type: 'timestamp' })
+  updatedAt?: Date;
 
-  @BeforeInsert()
-  generateCustomCode() {
-    this.customCode = `CUS_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
-  }
-
-
+  @DeleteDateColumn({ type: 'timestamp', nullable: true })
+  deletedAt?: Date;
 }

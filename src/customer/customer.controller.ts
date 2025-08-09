@@ -2,7 +2,7 @@ import {
   Delete, Controller, Get, Put, Post, ValidationPipe, Body, 
   UseInterceptors, UploadedFile, Param, Patch, ParseIntPipe 
 } from '@nestjs/common';
-import { createCustomerDto } from './dtos/create_customer.dto';
+import { CreateCustomerDto } from './dtos/create_customer.dto';
 import { customerService } from './customer.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MulterError, diskStorage } from 'multer';
@@ -42,7 +42,7 @@ export class CustomerController {
   @Post('addCustomer')
   createCustomer(
     @Body(new ValidationPipe({ whitelist: true, transform: true }))
-    customer: createCustomerDto
+    customer: CreateCustomerDto
   ) {
     this.customer_service.createCustomer(customer);
     return 'Customer created successfully';

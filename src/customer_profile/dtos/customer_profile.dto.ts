@@ -1,93 +1,63 @@
-import { IsBoolean, IsEmail,  IsIn,  IsMobilePhone, IsNotEmpty, IsNumber, IsOptional, IsString, Matches, Min, MinLength, } from "class-validator";
+import {
+  IsBoolean,
+  IsEmail,
+  IsIn,
+  IsOptional,
+  IsString,
+  Matches,
+  MinLength,
+  IsMobilePhone,
+} from "class-validator";
 
-export class customerProfileDto {
-
-
-
-
-
-//full_name;
+export class CustomerProfileDto {
+  // full_name - optional string
   @IsString()
-  //@IsNotEmpty()
   @IsOptional()
-  full_name: string;
+  full_name?: string;
 
+  // email - optional, must be valid if provided
+  @IsEmail({}, { message: "Invalid email address" })
+  @IsOptional()
+  email?: string;
 
+  // phone - optional string, must be valid Bangladeshi phone number if provided
+  @IsMobilePhone("bn-BD", {}, { message: "Phone number must be a valid Bangladeshi number" })
+  @IsOptional()
+  phone?: string;
 
-// email;
-  @IsEmail()
-  @IsNotEmpty()
-  @Matches(/^[\w.-]+@aiub\.edu$/, {
-    message: 'Email must contain @aiub.edu domain',
-  })
-  email: string;
-
-
-
-
-// // phone;
-//  @IsMobilePhone('bn-BD', {},{
-//   message: 'Mobile number must be a valid Bangladeshi number',
-// })
-@IsNotEmpty()
-@IsNumber()
-@Min(0, { message: 'Phone number must be a positive number' })
-phone: number;
-// @Matches(/^\d+$/, {
-// message: 'Mobile number must contain only digits',
-// })
-
-// phone: string;
-
-
-
-
-
-// address;
+  // address - optional string
   @IsString()
-  @IsNotEmpty()
-  address: string;
+  @IsOptional()
+  address?: string;
 
+  // password - optional string, if provided min length and uppercase letter
+  @IsString()
+  @IsOptional()
+  @MinLength(6, { message: "Password must be at least 6 characters long" })
+  @Matches(/(?=.*[A-Z])/, {
+    message: "Password must contain at least one uppercase letter",
+  })
+  password?: string;
 
+  // confirm_password - optional string, same validation as password
+  @IsString()
+  @IsOptional()
+  @MinLength(6, { message: "Password must be at least 6 characters long" })
+  @Matches(/(?=.*[A-Z])/, {
+    message: "Password must contain at least one uppercase letter",
+  })
+  confirm_password?: string;
 
-
-// password;
-@IsString()
-@IsNotEmpty()
-@MinLength(6, { message: 'Password must be at least 6 characters long' })
-@Matches(/(?=.*[A-Z])/, { message: 'Password must contain at least one uppercase letter' })
-password: string;
-
-
-
-
-// confirm_password;
-@IsString()
-@IsNotEmpty()
-@MinLength(6, { message: 'Password must be at least 6 characters long' })
-@Matches(/(?=.*[A-Z])/, { message: 'Password must contain at least one uppercase letter' })
-confirm_password: string;
-
-
-
-
-//gender;
-@IsString()
-@IsOptional()
-@IsIn(['male', 'female'], {
+  // gender - optional, must be "male" or "female" if provided
+  @IsString()
+  @IsOptional()
+  @IsIn(["male", "female"], {
     message: 'Gender must be either "male" or "female"',
   })
-gender?: string;
+  gender?: string;
 
-
-//active status;
-@IsOptional()
-@IsBoolean()
-isActive: boolean;
-
-
-
-
-
-
+  // isActive - optional boolean
+  @IsBoolean()
+  @IsOptional()
+  isActive?: boolean;
 }

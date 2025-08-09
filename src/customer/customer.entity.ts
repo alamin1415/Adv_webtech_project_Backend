@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from "typeorm";
 
 @Entity()
 export class Customer {
@@ -6,36 +6,20 @@ export class Customer {
   id: number;
 
   @Column({ type: 'varchar', nullable: true })
-  full_name: string;
+  full_name?: string; // Optional
 
-  @Column()
-  email: string;
+  @Column({ type: 'varchar', nullable: true })
+  email?: string; // Optional
 
-  //  @Column()
-  //  phone: string;
-  @Column({ type: 'bigint', unsigned: true })
-  phone: number;
+  @Column({ type: 'varchar', nullable: false })
+  phone: string; // Required (Not nullable), now as string
 
-  @Column()
-  address: string;  
+  @CreateDateColumn({ type: 'timestamp' })
+  createdAt: Date; // Auto-set when row is created
 
-  @Column()
-  password: string;
+  @UpdateDateColumn({ type: 'timestamp' })
+  updatedAt: Date; // Auto-updated on row update
 
-  @Column({ nullable: true })
-  gender?: string;
-
-  @Column({ type: 'boolean', default: true })
-  isActive: boolean;
-
-
-  @Column({ unique: true })
-  customCode: string; // Your custom code stored here
-
-  @BeforeInsert()
-  generateCustomCode() {
-    this.customCode = `CUS_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
-  }
-
-
+  @DeleteDateColumn({ type: 'timestamp', nullable: true })
+  deletedAt?: Date; // Soft delete timestamp
 }
