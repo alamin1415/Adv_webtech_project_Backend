@@ -14,9 +14,9 @@ import { CustomerProfileModule } from './customer_profile/customer_profile.modul
 
 
     type: 'postgres',
-    entities: [Customer],
+    //entities: [Customer],
     synchronize: true,
-    //autoLoadEntities: true,
+    autoLoadEntities: true,
     host: 'localhost',
     port: 5432,
     username: 'postgres',

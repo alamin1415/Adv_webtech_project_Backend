@@ -74,9 +74,11 @@ async updateCustomerById(id: number, updateData: UpdateCustomerDto): Promise<str
 }
 
 
-async getCustomersWithNullFullName(): Promise<Customer[]> {
-  return await this.customerRepo.find({
+async getCustomersWithNullFullName(): Promise<Customer|null> {
+  
+  return await this.customerRepo.findOne({
     where: [{
+      
       full_name: IsNull()},
       { full_name: '' }]
     

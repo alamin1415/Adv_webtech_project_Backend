@@ -160,6 +160,12 @@ deleteCustomerById(@Param('id') id: number) {
 
 
 
+// @Get('customers')
+// getCustomers(@Query('name') name: string, @Query('age') age: string) {
+//   return `Customer Name: ${name}, Age: ${age}`;
+// }
+
+
 
 
 
