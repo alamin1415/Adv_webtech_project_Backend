@@ -14,6 +14,7 @@ export class CustomerController {
 
   // ---------------- GET METHODS ----------------
 
+
   @Get('null')
   getCustomersWithNullFullName() {
     return this.customer_service.getCustomersWithNullFullName();
@@ -24,7 +25,7 @@ export class CustomerController {
     return this.customer_service.getCustomerById(id);
   }
 
- 
+  
 
   @Get('track')
   TrackCustomerParcelById() {
