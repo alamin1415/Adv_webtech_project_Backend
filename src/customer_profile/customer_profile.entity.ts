@@ -1,3 +1,5 @@
+import { on } from "events";
+import { Customer } from "src/customer/customer.entity";
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -5,12 +7,15 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  OneToOne,
+  JoinColumn,
 } from "typeorm";
 
 @Entity()
 export class Customer_profile {
   @PrimaryGeneratedColumn()
   id: number;
+
 
   @Column({ type: 'varchar', nullable: true })
   full_name?: string;
@@ -33,6 +38,7 @@ export class Customer_profile {
   @Column({ type: 'boolean', nullable: true })
   isActive?: boolean;
 
+
   @CreateDateColumn({ type: 'timestamp' })
   createdAt?: Date;
 
@@ -40,5 +46,10 @@ export class Customer_profile {
   updatedAt?: Date;
 
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
+  
   deletedAt?: Date;
+
+  @OneToOne(() => Customer,(Customer)=> Customer.profile,{onDelete: "CASCADE"})
+  @JoinColumn()
+  customer: Customer;
 }

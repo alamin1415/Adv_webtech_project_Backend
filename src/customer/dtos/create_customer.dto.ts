@@ -6,6 +6,7 @@ import {
   IsOptional,
   IsString,
 } from "class-validator";
+import { CustomerProfileDto } from "src/customer_profile/dtos/customer_profile.dto";
 
 export class CreateCustomerDto {
   // Full name (optional)
@@ -23,4 +24,8 @@ export class CreateCustomerDto {
   @IsMobilePhone('bn-BD', {}, { message: 'Mobile number must be a valid Bangladeshi number' })
   @IsNumberString({}, { message: 'Phone number must contain only digits' })
   phone: string; // Use string here for better phone handling
+
+
+  @IsOptional()
+  profile:CustomerProfileDto|null;
 }

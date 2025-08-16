@@ -60,4 +60,8 @@ export class CustomerProfileDto {
   @IsBoolean()
   @IsOptional()
   isActive?: boolean;
+
+  
+
+
 }

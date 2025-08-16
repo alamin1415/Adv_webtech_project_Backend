@@ -7,22 +7,28 @@ import { customerService } from './customer.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MulterError, diskStorage } from 'multer';
 import { UpdateCustomerDto } from './dtos/update_customer.dto';
+import { UpdateCustomerPutDto } from './dtos/update_customer_put.dto';
 
 @Controller('customer')
 export class CustomerController {
-  constructor(private customer_service: customerService) {}
+  constructor(private customer_service: customerService
+    
+  ) {}
+  
+  
 
   // ---------------- GET METHODS ----------------
 
+  @Get("all_customers")
+  getAllCustomers() {
+
+    return this.customer_service.getCustomerDetails();
+    
+  }
 
   @Get('null')
   getCustomersWithNullFullName() {
     return this.customer_service.getCustomersWithNullFullName();
-  }
-
-  @Get(':id')
-  getCustomerById(@Param('id', ParseIntPipe) id: number) {
-    return this.customer_service.getCustomerById(id);
   }
 
   
@@ -37,9 +43,16 @@ export class CustomerController {
     return 'Customer details retrieved successfully';
   }
 
+  @Get(':id')
+  getCustomerById(@Param('id', ParseIntPipe) id: number) {
+    return this.customer_service.getCustomerById(id);
+  }
+
+  
+
   // ---------------- POST METHODS ----------------
 
-  @Post('addCustomer')
+  @Post('add_customers')
   createCustomer(
     @Body(new ValidationPipe({ whitelist: true, transform: true }))
     customer: CreateCustomerDto
@@ -47,6 +60,8 @@ export class CustomerController {
     this.customer_service.createCustomer(customer);
     return 'Customer created successfully';
   }
+
+
 
   @Post('profile_picture')
   @UseInterceptors(FileInterceptor('file', {
@@ -72,20 +87,42 @@ export class CustomerController {
 
   // ---------------- PUT METHODS ----------------
 
-  @Put('UpdateCustomer')
-  UpdateCustomerById() {
-    return 'Customer successfully updated';
-  }
+  // @Put('UpdateCustomer')
+  // UpdateCustomerById() {
+  //   return 'Customer successfully updated';
+  // }
+
+
+@Put(':id')
+replaceCustomer(
+  @Param('id', ParseIntPipe) id: number,
+  @Body(new ValidationPipe()) customer: UpdateCustomerPutDto
+) {
+  return this.customer_service.replaceCustomer(id, customer);
+}
+
+
+
+
 
   // ---------------- PATCH METHODS ----------------
 
   @Patch(':id')
   updateCustomerById(
-    @Param('id') id: number,
+    @Param('id',ParseIntPipe) id: number,
     @Body(new ValidationPipe()) customer: UpdateCustomerDto
   ) {
     this.customer_service.updateCustomerById(+id, customer);
     return 'Customer updated successfully';
+  }
+  
+  // ✅ Update by phone (string)
+  @Patch('by-phone/:phone')
+  updateCustomerByPhone(
+    @Param('phone') phone: string,
+    @Body(new ValidationPipe()) customer: UpdateCustomerDto
+  ) {
+    return this.customer_service.updateCustomerByPhone(phone, customer);
   }
 
   // ---------------- DELETE METHODS ----------------
