@@ -21,6 +21,17 @@ export class CustomerProfileService {
                 customer:true
             }}
         )
+    }
+
+    findByNumber(number: string) {
+
+    return this.profileRepo.findOne({
+      where: { phone: number }, 
+      relations: {
+        customer: true,
+      }
+    })
+    
             
     }
 

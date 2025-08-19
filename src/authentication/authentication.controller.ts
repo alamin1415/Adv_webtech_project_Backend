@@ -11,7 +11,7 @@ constructor(private readonly authenticationService: AuthenticationService) {
 
 }
 
-@UseGuards(authorizeGuards)
+//@UseGuards(authorizeGuards)
 @Post("singup")
 async signup(@Body() createCustomerDto: CreateCustomerDto) {
     return await this.authenticationService.signup(createCustomerDto);
