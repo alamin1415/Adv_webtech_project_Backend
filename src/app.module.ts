@@ -6,6 +6,7 @@ import { Module } from '@nestjs/common';
 import { CustomerModule } from './customer/customer.module';
 import { Customer } from './customer/customer.entity';
 import { CustomerProfileModule } from './customer_profile/customer_profile.module';
+import { AuthenticationModule } from './authentication/authentication.module';
 
 
 @Module({
@@ -26,7 +27,7 @@ import { CustomerProfileModule } from './customer_profile/customer_profile.modul
     
     })
 
-  }), CustomerModule, CustomerProfileModule],
+  }), CustomerModule, CustomerProfileModule, AuthenticationModule],
   //controllers: [AppController],
   //providers: [AppService],
 })

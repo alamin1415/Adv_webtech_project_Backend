@@ -8,6 +8,7 @@ import { Customer_profile } from "src/customer_profile/customer_profile.entity";
 import { CustomerProfileDto } from "src/customer_profile/dtos/customer_profile.dto";
 import { create } from "domain";
 import { UpdateCustomerPutDto } from "./dtos/update_customer_put.dto";
+import { HashingProvider } from "src/authentication/provider/hashing.provider";
 
 @Injectable()
 export class customerService {
@@ -16,7 +17,9 @@ export class customerService {
     private customerRepo: Repository<Customer>,
 
     @InjectRepository(Customer_profile)
-    private profileRepo: Repository<Customer_profile>
+    private profileRepo: Repository<Customer_profile>,
+
+    private readonly hasingProvider: HashingProvider
     
     
   ) {}
@@ -44,9 +47,13 @@ getCustomerDetails() {
     // let pro = this.profileRepo.create(customer.profile);
     // await this.profileRepo.save(pro);
 
-    let cus = this.customerRepo.create(customer)
+    let cus = this.customerRepo.create({
+      ...customer,
+      password: await this.hasingProvider.hashpassword(customer.password),
 
-    // cus.profile = pro; 
+      })
+
+    // cus.profile = pro;   
         
      return await this.customerRepo.save(cus);
     
@@ -60,11 +67,23 @@ getCustomerDetails() {
 
   }
 
- 
-
+   // Find the customer by Id number
   getCustomerById(id: number) {
     return this.customerRepo.findOne({ where: { id } });
   }
+
+
+  // Find the customer by phone number
+  async findCustomerByPhone(phone: string) {
+
+  const customer = await this.customerRepo.findOne({ where: { phone } });
+
+  if (!customer) {
+    throw new NotFoundException(`Customer with phone number ${phone} not found`);
+  }
+
+  return customer;
+}
 
 
 

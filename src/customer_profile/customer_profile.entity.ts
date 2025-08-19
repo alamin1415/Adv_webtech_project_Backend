@@ -1,4 +1,3 @@
-import { on } from "events";
 import { Customer } from "src/customer/customer.entity";
 import {
   Entity,

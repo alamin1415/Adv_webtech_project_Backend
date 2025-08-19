@@ -16,23 +16,16 @@ export class Customer {
   phone: string; // Required (Not nullable), now as string
 
 
+  @Column({ type: 'varchar', nullable: false })
+  password: string; // Required
+
+
   @OneToOne(() => Customer_profile, (Customer_profile)=>Customer_profile.customer,{ nullable: true,
     cascade: ["insert", "update"], // cascade remove
     //eager: true  // Automatically load profile when fetching customer
    })
   //@JoinColumn()
   profile: Customer_profile|null; // Optional, can be used to link to a profile entity
-  
-
-
-
-  // @OneToOne(() => Customer_profile, {
-  //   nullable: true,
-  //   cascade: ["insert", "update", "remove"], // cascade remove
-  //   onDelete: "CASCADE" // database level cascade
-  // })
-  // // @JoinColumn()
-  // profile?: Customer_profile|null;
   
 
   

@@ -5,6 +5,7 @@ import {
   IsNumberString,
   IsOptional,
   IsString,
+  MinLength,
 } from "class-validator";
 import { CustomerProfileDto } from "src/customer_profile/dtos/customer_profile.dto";
 
@@ -25,7 +26,11 @@ export class CreateCustomerDto {
   @IsNumberString({}, { message: 'Phone number must contain only digits' })
   phone: string; // Use string here for better phone handling
 
+  // Password (required)
+  @IsNotEmpty({ message: 'Password is required' })
+  @MinLength(6, { message: 'Password must be at least 6 characters long' })
+  password: string;
 
   @IsOptional()
-  profile:CustomerProfileDto|null;
+  profile: CustomerProfileDto | null;
 }

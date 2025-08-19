@@ -1,6 +1,7 @@
 import { 
   Delete, Controller, Get, Put, Post, ValidationPipe, Body, 
-  UseInterceptors, UploadedFile, Param, Patch, ParseIntPipe 
+  UseInterceptors, UploadedFile, Param, Patch, ParseIntPipe, 
+  UseGuards
 } from '@nestjs/common';
 import { CreateCustomerDto } from './dtos/create_customer.dto';
 import { customerService } from './customer.service';
@@ -8,6 +9,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { MulterError, diskStorage } from 'multer';
 import { UpdateCustomerDto } from './dtos/update_customer.dto';
 import { UpdateCustomerPutDto } from './dtos/update_customer_put.dto';
+import { authorizeGuards } from 'src/authentication/guards/authorize.guards';
 
 @Controller('customer')
 export class CustomerController {
@@ -18,7 +20,7 @@ export class CustomerController {
   
 
   // ---------------- GET METHODS ----------------
-
+  @UseGuards(authorizeGuards)
   @Get("all_customers")
   getAllCustomers() {
 
@@ -43,7 +45,14 @@ export class CustomerController {
     return 'Customer details retrieved successfully';
   }
 
-  @Get(':id')
+  // GET /customers/phone/:phone
+  @Get('phone/:phone')
+  async getCustomerByPhone(@Param('phone') phone: string) {
+    return this.customer_service.findCustomerByPhone(phone);
+  }
+
+  @UseGuards(authorizeGuards)
+  @Get('id/:id')
   getCustomerById(@Param('id', ParseIntPipe) id: number) {
     return this.customer_service.getCustomerById(id);
   }
