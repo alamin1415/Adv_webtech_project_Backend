@@ -7,21 +7,21 @@ export class Customer {
   id: number;
 
   @Column({ type: 'varchar', nullable: true })
-  full_name?: string; // Optional
+  full_name?: string; 
 
-  @Column({ type: 'varchar', nullable: true })
-  email?: string; // Optional
+  @Column({ type: 'varchar', nullable: true,unique:true })
+  email?: string; 
+
+  @Column({ type: 'varchar', nullable: false,unique:true})
+  phone: string; 
+
 
   @Column({ type: 'varchar', nullable: false })
-  phone: string; // Required (Not nullable), now as string
-
-
-  @Column({ type: 'varchar', nullable: false })
-  password: string; // Required
+  password: string; 
 
 
   @OneToOne(() => Customer_profile, (Customer_profile)=>Customer_profile.customer,{ nullable: true,
-    cascade: ["insert", "update"], // cascade remove
+    cascade: ["insert", "update","remove"], // cascade remove
     //eager: true  // Automatically load profile when fetching customer
    })
   //@JoinColumn()

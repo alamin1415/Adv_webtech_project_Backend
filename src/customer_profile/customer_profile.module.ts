@@ -10,13 +10,13 @@ import { authorizeGuards } from 'src/authentication/guards/authorize.guards'; //
 @Module({
   imports: [
     TypeOrmModule.forFeature([Customer_profile, Customer]),
-    JwtModule.register({  // <-- JwtModule register করা
-      secret: 'mySuperSecretKey123!', // তোমার secret
-      signOptions: { expiresIn: '1h' }, // token expiration
+    JwtModule.register({  
+      secret: 'mySuperSecretKey123!', 
+      signOptions: { expiresIn: '1h' }, 
     }),
   ],
   controllers: [CustomerProfileController],
-  providers: [CustomerProfileService, authorizeGuards], // <-- guard provider এ যুক্ত
-  exports: [authorizeGuards], // <-- অন্য জায়গায় ব্যবহার করার জন্য export
+  providers: [CustomerProfileService, authorizeGuards], 
+  exports: [authorizeGuards], // 
 })
 export class CustomerProfileModule {}

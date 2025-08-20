@@ -1,12 +1,10 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException, HttpException, HttpStatus } from "@nestjs/common";
 import { Repository, IsNull } from "typeorm";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Customer } from "./customer.entity";
+import { Customer_profile } from "src/customer_profile/customer_profile.entity";
 import { CreateCustomerDto } from "./dtos/create_customer.dto";
 import { UpdateCustomerDto } from "./dtos/update_customer.dto";
-import { Customer_profile } from "src/customer_profile/customer_profile.entity";
-import { CustomerProfileDto } from "src/customer_profile/dtos/customer_profile.dto";
-import { create } from "domain";
 import { UpdateCustomerPutDto } from "./dtos/update_customer_put.dto";
 import { HashingProvider } from "src/authentication/provider/hashing.provider";
 
@@ -14,83 +12,166 @@ import { HashingProvider } from "src/authentication/provider/hashing.provider";
 export class customerService {
   constructor(
     @InjectRepository(Customer)
-    private customerRepo: Repository<Customer>,
+    private readonly customerRepo: Repository<Customer>,
 
     @InjectRepository(Customer_profile)
-    private profileRepo: Repository<Customer_profile>,
+    private readonly profileRepo: Repository<Customer_profile>,
 
     private readonly hasingProvider: HashingProvider
-    
-    
   ) {}
 
-  // ---------------- GET METHODS ----------------
-getCustomerDetails() {
-  
-  return this.customerRepo.find({
-  
-    relations:{
-      profile:true
-    } 
+  //------------------------------------------------- GET METHODS ------------------------------------------------------------
+  public async getCustomerDetails() {
+    try {
+      const customers = await this.customerRepo.find({
+        relations: { profile: true },
+      });
 
-  });
-}
+      if (!customers || customers.length === 0) {
+        throw new HttpException(
+          {
+            statusCode: HttpStatus.NOT_FOUND,
+            message: "No customers found",
+            error: "Not Found",
+          },
+          HttpStatus.NOT_FOUND
+        );
+      }
 
+      return {
+        statusCode: HttpStatus.OK,
+        message: "Customers retrieved successfully",
+        data: customers,
+      };
+    } catch (error) {
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: "Database connection problem",
+          error: error.message || "Internal Server Error",
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  } //......................................................................................................................
 
+  public async getCustomersWithNullFullName() {
+    try {
+      const customers = await this.customerRepo.find({
+        where: [{ full_name: IsNull() }, { full_name: "" }],
+      });
+
+      if (!customers || customers.length === 0) {
+        throw new HttpException(
+          {
+            statusCode: HttpStatus.NOT_FOUND,
+            message: "No customers found with null or empty full name",
+            error: "Not Found",
+          },
+          HttpStatus.NOT_FOUND
+        );
+      }
+
+      return {
+        statusCode: HttpStatus.OK,
+        message: "Customers retrieved successfully",
+        data: customers,
+      };
+    } catch (error) {
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: "Database connection problem",
+          error: error.message || "Internal Server Error",
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
+    }
+  } //......................................................................................................................
+
+  public TrackCustomerParcelById() {
+    return "Track All Customer Parcel successfully By Id";
+  } //......................................................................................................................
+
+  public getCustomerDetailInfo() {
+    return "Customer details retrieved successfully";
+  } //......................................................................................................................
+
+  public async findCustomerByPhone(phone: string) {
+    const customer = await this.customerRepo.findOne({ where: { phone } });
+
+    if (!customer) {
+      throw new NotFoundException(`Customer with phone number ${phone} not found`);
+    }
+
+    return customer;
+  } //......................................................................................................................
+
+  public async getCustomerById(id: number) {
+    const customer = await this.customerRepo.findOne({ where: { id } });
+    if (!customer) {
+      throw new NotFoundException(`Customer with ID ${id} not found`);
+    }
+    return customer;
+  } //......................................................................................................................
+
+  //------------------------------------------------- POST METHODS ------------------------------------------------------------
   public async createCustomer(customer: CreateCustomerDto) {
+    const existingCustomer = await this.customerRepo.findOne({
+      where: [{ phone: customer.phone }, { email: customer.email }],
+    });
 
-    
-    // const newCustomer = this.customerRepo.create(customer);
-    // return await this.customerRepo.save(newCustomer);
+    if (existingCustomer) {
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.CONFLICT,
+          message: "Customer with this phone or email already exists",
+          error: "Conflict",
+        },
+        HttpStatus.CONFLICT
+      );
+    }
 
-    customer.profile = customer.profile ?? {} ;
-    // let pro = this.profileRepo.create(customer.profile);
-    // await this.profileRepo.save(pro);
+    customer.profile = customer.profile ?? {};
+    const profileEntity = this.profileRepo.create(customer.profile);
+    await this.profileRepo.save(profileEntity);
 
-    let cus = this.customerRepo.create({
+    const cus = this.customerRepo.create({
       ...customer,
       password: await this.hasingProvider.hashpassword(customer.password),
+      profile: profileEntity,
+    });
 
-      })
+    const savedCustomer = await this.customerRepo.save(cus);
 
-    // cus.profile = pro;   
-        
-     return await this.customerRepo.save(cus);
-    
-    
-
-    // CustomerProfileDto.profile = profile;
-
-    // return await this.customerRepo.save(Customer);
-
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: "Customer created successfully",
+      data: savedCustomer,
+    };
+  } //......................................................................................................................
 
 
-  }
-
-   // Find the customer by Id number
-  getCustomerById(id: number) {
-    return this.customerRepo.findOne({ where: { id } });
-  }
-
-
-  // Find the customer by phone number
-  async findCustomerByPhone(phone: string) {
-
-  const customer = await this.customerRepo.findOne({ where: { phone } });
-
-  if (!customer) {
-    throw new NotFoundException(`Customer with phone number ${phone} not found`);
-  }
-
-  return customer;
-}
-
-
-
-
-  async updateCustomerById(id: number, updateData: UpdateCustomerDto): Promise<string> {
+  
+  //------------------------------------------------- PUT METHODS ------------------------------------------------------------
+  public async replaceCustomer(id: number, updateData: UpdateCustomerPutDto) {
     const existingCustomer = await this.customerRepo.findOne({ where: { id } });
+    if (!existingCustomer) {
+      throw new NotFoundException(`Customer with ID ${id} not found`);
+    }
 
+    const replacedCustomer = this.customerRepo.create({
+      ...updateData,
+      id: existingCustomer.id,
+    });
+
+    await this.customerRepo.save(replacedCustomer);
+    return "Customer replaced successfully";
+  } //......................................................................................................................
+
+  //------------------------------------------------- PATCH METHODS ------------------------------------------------------------
+  public async updateCustomerById(id: number, updateData: UpdateCustomerDto) {
+    const existingCustomer = await this.customerRepo.findOne({ where: { id } });
     if (!existingCustomer) {
       throw new NotFoundException(`Customer with ID ${id} not found`);
     }
@@ -98,98 +179,29 @@ getCustomerDetails() {
     const updatedCustomer = this.customerRepo.merge(existingCustomer, updateData);
     await this.customerRepo.save(updatedCustomer);
 
-    return 'Customer updated successfully';
-  }
+    return "Customer updated successfully";
+  } //......................................................................................................................
 
+  public async updateCustomerByPhone(phone: string, updateData: UpdateCustomerDto) {
+    const existingCustomer = await this.customerRepo.findOne({ where: { phone } });
+    if (!existingCustomer) {
+      throw new NotFoundException(`Customer with phone number ${phone} not found`);
+    }
 
-async updateCustomerByPhone(phone: string, updateData: UpdateCustomerDto): Promise<string> {
-  // Find the customer by phone number
-  const existingCustomer = await this.customerRepo.findOne({ where: { phone } });
+    const updatedCustomer = this.customerRepo.merge(existingCustomer, updateData);
+    await this.customerRepo.save(updatedCustomer);
 
-  if (!existingCustomer) {
-    throw new NotFoundException(`Customer with phone number ${phone} not found`);
-  }
+    return "Customer updated successfully by phone";
+  } //......................................................................................................................
 
-  // Merge new data into the existing customer entity
-  const updatedCustomer = this.customerRepo.merge(existingCustomer, updateData);
-
-  // Save the updated customer to the database
-  await this.customerRepo.save(updatedCustomer);
-
-  return 'Customer updated successfully by phone';
-}
-
-
-//''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-async replaceCustomer(id: number, updateData: UpdateCustomerPutDto): Promise<string> {
-  // Find the customer by ID
-  const existingCustomer = await this.customerRepo.findOne({ where: { id } });
-
-  if (!existingCustomer) {
-    throw new NotFoundException(`Customer with ID ${id} not found`);
-  }
-
-  // Replace all data of the existing customer with the new data
-  // This assumes that you want to overwrite all fields
-  const replacedCustomer = this.customerRepo.create({
-    ...updateData,
-    id: existingCustomer.id, // keep the same ID
-  });
-
-  // Save the replaced customer to the database
-  await this.customerRepo.save(replacedCustomer);
-
-  return 'Customer replaced successfully';
-}
-//.......................................................
-
-
-
-  async deleteCustomerById(id: number): Promise<string> {
-
+  //------------------------------------------------- DELETE METHODS ------------------------------------------------------------
+  public async deleteCustomerById(id: number) {
     const existingCustomer = await this.customerRepo.findOne({ where: { id } });
-
     if (!existingCustomer) {
       throw new NotFoundException(`Customer with ID ${id} not found`);
     }
 
-      await this.customerRepo.delete(id);
-    // if (existingCustomer.profile && existingCustomer.profile.id) {
-    //   await this.profileRepo.delete(existingCustomer.profile.id);
-    // } 
+    await this.customerRepo.delete(id);
     return `Customer with ID ${id} has been deleted successfully`;
-  }
-
-
-
-//   async deleteCustomerById(id: number): Promise<string> {
-//   // Find the customer along with their profile
-//   const existingCustomer = await this.customerRepo.findOne({
-//     where: { id },
-//     relations: ["profile"], // include the related profile
-//   });
-
-//   if (!existingCustomer) {
-//     throw new NotFoundException(`Customer with ID ${id} not found`);
-//   }
-
-//   // Remove the customer; cascade will delete the profile too
-//   await this.customerRepo.remove(existingCustomer);
-
-//   return `Customer with ID ${id} and their profile have been deleted successfully`;
-// }
-
-
-  
-  
-
-  async getCustomersWithNullFullName(): Promise<Customer | null> {
-    return await this.customerRepo.findOne({
-      where: [
-        { full_name: IsNull() },
-        { full_name: '' }
-
-      ]
-    });
-  }
+  } //......................................................................................................................
 }

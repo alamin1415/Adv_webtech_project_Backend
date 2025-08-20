@@ -13,18 +13,15 @@ export class AuthenticationService {
     private readonly customerservice: customerService,
     private readonly hashingProvider: HashingProvider,
     private readonly jwtService: JwtService,
-    private readonly emailService: EmailService, // <-- যোগ হলো
+    private readonly emailService: EmailService, 
   ) {}
 
 
 public async signup(createCustomerDto: CreateCustomerDto) {
-    // 1) কাস্টমার তৈরি করো
     await this.customerservice.createCustomer(createCustomerDto);
 
-    // 2) যদি createCustomer() কোনো entity না রিটার্ন করে, তখন ফোন দিয়ে খুঁজে নাও
     const customer = await this.customerservice.findCustomerByPhone(createCustomerDto.phone);
 
-    // 3) ইমেইল থাকলে ওয়েলকাম মেইল পাঠাও
     const emailTo = customer?.email ?? createCustomerDto?.email;
     const name = customer?.full_name ?? createCustomerDto?.full_name;
 
@@ -32,12 +29,10 @@ public async signup(createCustomerDto: CreateCustomerDto) {
         try {
             await this.emailService.sendWelcomeEmail(emailTo, name);
         } catch (e) {
-            // ইমেইল ব্যর্থ হলেও সাইনআপ ব্যর্থ হবে না
-            console.warn('Welcome email failed:', e.message);
+            console.warn('email failed:', e.message);
         }
     }
 
-    // 4) রেসপন্স
     return {
         message: 'Dear Customer, your information has been saved successfully',
     };
@@ -66,9 +61,8 @@ public async signup(createCustomerDto: CreateCustomerDto) {
       secret: 'mySuperSecretKey123!',
     });
 
-    // (অপশনাল) লগইন হলে ইমেইল অ্যালার্ট
-    // যদি customer.email থাকে, তাহলে পাঠাও
-    // void this.emailService.sendLoginNotice(customer.email, customer.full_name);
+ 
+     //void this.emailService.sendLoginNotice(customer.email, customer.full_name);
 
     return {
       message: 'Dear Customer you are successfully logged in',

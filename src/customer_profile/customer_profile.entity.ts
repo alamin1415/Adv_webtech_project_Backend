@@ -29,9 +29,6 @@ export class Customer_profile {
   address?: string;
 
   @Column({ type: 'varchar', nullable: true })
-  password?: string;
-
-  @Column({ type: 'varchar', nullable: true })
   gender?: string;
 
   @Column({ type: 'boolean', nullable: true })

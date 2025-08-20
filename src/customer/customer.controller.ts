@@ -13,132 +13,77 @@ import { authorizeGuards } from 'src/authentication/guards/authorize.guards';
 
 @Controller('customer')
 export class CustomerController {
-  constructor(private customer_service: customerService
-    
-  ) {}
+  constructor(private customer_service: customerService) {}
   
-  
-
-  // ---------------- GET METHODS ----------------
-  @UseGuards(authorizeGuards)
+  //------------------------------------------------- GET METHODS ------------------------------------------------------------
   @Get("all_customers")
-  getAllCustomers() {
-
-    return this.customer_service.getCustomerDetails();
-    
-  }
-
-  @Get('null')
-  getCustomersWithNullFullName() {
-    return this.customer_service.getCustomersWithNullFullName();
-  }
-
+  async getAllCustomers() {
+    return await this.customer_service.getCustomerDetails();
+  } //..................................................................
   
-
+  @Get('null')
+  async getCustomersWithNullFullName() {
+    return await this.customer_service.getCustomersWithNullFullName();
+  } //..................................................................
+  
   @Get('track')
   TrackCustomerParcelById() {
     return 'Track All Customer Parcel successfully By Id';
-  }
-
+  } //..................................................................
+  
   @Get('Details')
   getCustomerDetails() {
     return 'Customer details retrieved successfully';
-  }
-
-  // GET /customers/phone/:phone
+  } //..................................................................
+  
   @Get('phone/:phone')
   async getCustomerByPhone(@Param('phone') phone: string) {
-    return this.customer_service.findCustomerByPhone(phone);
-  }
-
-  @UseGuards(authorizeGuards)
-  @Get('id/:id')
-  getCustomerById(@Param('id', ParseIntPipe) id: number) {
-    return this.customer_service.getCustomerById(id);
-  }
-
+    return await this.customer_service.findCustomerByPhone(phone);
+  } //..................................................................
   
-
-  // ---------------- POST METHODS ----------------
-
+  @Get('id/:id')
+  async getCustomerById(@Param('id', ParseIntPipe) id: number) {
+    return await this.customer_service.getCustomerById(id);
+  } //..................................................................
+  
+  //------------------------------------------------- POST METHODS ------------------------------------------------------------
   @Post('add_customers')
-  createCustomer(
+  async createCustomer(
     @Body(new ValidationPipe({ whitelist: true, transform: true }))
     customer: CreateCustomerDto
   ) {
-    this.customer_service.createCustomer(customer);
-    return 'Customer created successfully';
-  }
-
-
-
-  @Post('profile_picture')
-  @UseInterceptors(FileInterceptor('file', {
-    fileFilter: (req, file, cb) => {
-      if (file.originalname.match(/^.*\.(jpg|webp|png|jpeg)$/)) {
-        cb(null, true);
-      } else {
-        cb(new MulterError('LIMIT_UNEXPECTED_FILE', 'image'), false);
-      }
-    },
-    limits: { fileSize: 500000 },
-    storage: diskStorage({
-      destination: './uploads',
-      filename: (req, file, cb) => {
-        cb(null, Date.now() + file.originalname);
-      },
-    }),
-  }))
-  uploadFile(@UploadedFile() file: Express.Multer.File) {
-    console.log(file);
-    return 'File uploaded successfully';
-  }
-
-  // ---------------- PUT METHODS ----------------
-
-  // @Put('UpdateCustomer')
-  // UpdateCustomerById() {
-  //   return 'Customer successfully updated';
-  // }
-
-
-@Put(':id')
-replaceCustomer(
-  @Param('id', ParseIntPipe) id: number,
-  @Body(new ValidationPipe()) customer: UpdateCustomerPutDto
-) {
-  return this.customer_service.replaceCustomer(id, customer);
-}
-
-
-
-
-
-  // ---------------- PATCH METHODS ----------------
-
+    return await this.customer_service.createCustomer(customer);
+  } 
+  //------------------------------------------------- PUT METHODS ------------------------------------------------------------
+  @Put(':id')
+  replaceCustomer(
+    @Param('id', ParseIntPipe) id: number,
+    @Body(new ValidationPipe()) customer: UpdateCustomerPutDto
+  ) {
+    return this.customer_service.replaceCustomer(id, customer);
+  } //..................................................................
+  
+  //------------------------------------------------- PATCH METHODS ------------------------------------------------------------
   @Patch(':id')
-  updateCustomerById(
+  async updateCustomerById(
     @Param('id',ParseIntPipe) id: number,
     @Body(new ValidationPipe()) customer: UpdateCustomerDto
   ) {
-    this.customer_service.updateCustomerById(+id, customer);
-    return 'Customer updated successfully';
-  }
+    return await this.customer_service.updateCustomerById(+id, customer);
+  } //..................................................................
   
-  // ✅ Update by phone (string)
   @Patch('by-phone/:phone')
-  updateCustomerByPhone(
+  async updateCustomerByPhone(
     @Param('phone') phone: string,
     @Body(new ValidationPipe()) customer: UpdateCustomerDto
   ) {
-    return this.customer_service.updateCustomerByPhone(phone, customer);
-  }
-
-  // ---------------- DELETE METHODS ----------------
-
+    return await this.customer_service.updateCustomerByPhone(phone, customer);
+  } //..................................................................
+  
+  //------------------------------------------------- DELETE METHODS ------------------------------------------------------------
   @Delete(':id')
-  deleteCustomerById(@Param('id') id: number) {
-    console.log(`Deleting customer with ID: ${id}`);
-    return this.customer_service.deleteCustomerById(+id);
-  }
+  async deleteCustomerById(@Param('id') id: number) {
+    console.log("Deleting customer with ID: ${id}");
+    return await this.customer_service.deleteCustomerById(+id);
+  } //..................................................................
 }

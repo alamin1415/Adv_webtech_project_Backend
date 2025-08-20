@@ -30,24 +30,6 @@ export class CustomerProfileDto {
   @IsOptional()
   address?: string;
 
-  // password - optional string, if provided min length and uppercase letter
-  @IsString()
-  @IsOptional()
-  @MinLength(6, { message: "Password must be at least 6 characters long" })
-  @Matches(/(?=.*[A-Z])/, {
-    message: "Password must contain at least one uppercase letter",
-  })
-  password?: string;
-
-  // confirm_password - optional string, same validation as password
-  @IsString()
-  @IsOptional()
-  @MinLength(6, { message: "Password must be at least 6 characters long" })
-  @Matches(/(?=.*[A-Z])/, {
-    message: "Password must contain at least one uppercase letter",
-  })
-  confirm_password?: string;
-
   // gender - optional, must be "male" or "female" if provided
   @IsString()
   @IsOptional()
@@ -60,8 +42,5 @@ export class CustomerProfileDto {
   @IsBoolean()
   @IsOptional()
   isActive?: boolean;
-
-  
-
 
 }
