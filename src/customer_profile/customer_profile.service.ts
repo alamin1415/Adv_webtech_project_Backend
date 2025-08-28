@@ -23,9 +23,9 @@ export class CustomerProfileService {
         )
     }
 
-    findByNumber(number: string) {
+    async findByNumber(number: string) {
 
-    return this.profileRepo.findOne({
+    return await this.profileRepo.findOne({
       where: { phone: number }, 
       relations: {
         customer: true,
@@ -34,6 +34,8 @@ export class CustomerProfileService {
     
             
     }
+
+
 
 
     

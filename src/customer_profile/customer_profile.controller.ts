@@ -6,7 +6,7 @@ import { authorizeGuards } from 'src/authentication/guards/authorize.guards';
 export class CustomerProfileController {
 
     constructor(private readonly customerProfileService: CustomerProfileService) {}
-
+    @UseGuards(authorizeGuards)
     @Get("all_profile")
     
     findAllCustomerProfile() {

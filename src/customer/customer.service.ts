@@ -24,7 +24,14 @@ export class customerService {
   public async getCustomerDetails() {
     try {
       const customers = await this.customerRepo.find({
-        relations: { profile: true },
+        relations: { profile: true 
+          
+                 
+         },
+     
+
+      
+
       });
 
       if (!customers || customers.length === 0) {
