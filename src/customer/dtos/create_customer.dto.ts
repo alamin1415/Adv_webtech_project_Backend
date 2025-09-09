@@ -1,4 +1,4 @@
-import { 
+import {
   IsEmail,
   IsMobilePhone,
   IsNotEmpty,
@@ -6,8 +6,8 @@ import {
   IsOptional,
   IsString,
   MinLength,
-} from "class-validator";
-import { CustomerProfileDto } from "src/customer_profile/dtos/customer_profile.dto";
+} from 'class-validator';
+import { CustomerProfileDto } from 'src/customer_profile/dtos/customer_profile.dto';
 
 export class CreateCustomerDto {
   // Full name (optional)
@@ -22,7 +22,11 @@ export class CreateCustomerDto {
 
   // Phone (required, must be valid Bangladeshi number)
   @IsNotEmpty({ message: 'Phone number is required' })
-  @IsMobilePhone('bn-BD', {}, { message: 'Mobile number must be a valid Bangladeshi number' })
+  @IsMobilePhone(
+    'bn-BD',
+    {},
+    { message: 'Mobile number must be a valid Bangladeshi number' },
+  )
   @IsNumberString({}, { message: 'Phone number must contain only digits' })
   phone: string; // Use string here for better phone handling
 
