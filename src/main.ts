@@ -1,20 +1,34 @@
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 import { AppModule } from './app.module';
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+console.log('PUSHER_INSTANCE_ID:', process.env.PUSHER_INSTANCE_ID);
+console.log('PUSHER_SECRET_KEY:', process.env.PUSHER_SECRET_KEY);
 
-  // সব API এবং সব ডোমেইনের জন্য CORS সক্রিয় করা
+async function bootstrap() {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  // Validation Pipe
+  app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
+
+  // Enable CORS (allowed all origins but can restrict later)
   app.enableCors({
-    origin: '*', // সব ডোমেইন থেকে অনুমোদন
+    origin: '*', // চাইলে 'http://localhost:4000' রাখতে পারো
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    credentials: true, // যদি cookies ব্যবহার করা হয়
+    credentials: true,
   });
 
-  // PORT environment variable বা default 3000 ব্যবহার করা
+  // Serve uploads folder
+  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
+    prefix: '/uploads/',
+  });
+
+  // Dynamic port (environment variable → fallback 3000)
   const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
   await app.listen(port);
 
-  console.log(`Server is running on http://localhost:${port}`);
+  console.log(`🚀 Server is running on http://localhost:${port}`);
 }
 bootstrap();

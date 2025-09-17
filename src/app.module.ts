@@ -1,41 +1,52 @@
-import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
+// Project Modules
+import { AdminModule } from './admin/admin.module';
+import { AuthModule } from './auth/auth.module';
+import { AuthenticationModule } from './authentication/authentication.module';
 import { CustomerModule } from './customer/customer.module';
 import { CustomerProfileModule } from './customer_profile/customer_profile.module';
-import { AuthenticationModule } from './authentication/authentication.module';
 import { EmailModule } from './email/email.module';
+import { ManagerModule } from './manager/manager.module';
 import { OrdersModule } from './orders/orders.module';
 
 @Module({
   imports: [
-    // 1️⃣ ConfigModule import করা হলো globally
-    ConfigModule.forRoot({ isGlobal: true }),
+    // 1️⃣ ConfigModule globally load .env
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env', // fallback চাইলে ['.env.local', '.env']
+    }),
 
-    // 2️⃣ TypeOrmModule configure করা হলো
+    // 2️⃣ TypeOrmModule configure (Postgres)
     TypeOrmModule.forRootAsync({
-      useFactory: () => ({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
         type: 'postgres',
-        synchronize: true,
+        host: config.get('DB_HOST') || 'localhost',
+        port: Number(config.get('DB_PORT') ?? 5432),
+        username: config.get('DB_USER') || 'postgres',
+        password: config.get('DB_PASS') || 'alamin',
+        database: config.get('DB_NAME') || 'laundry',
         autoLoadEntities: true,
-        host: 'localhost',
-        port: 5432,
-        username: 'postgres',
-        password: 'alamin',
-        database: 'laundry',
+        synchronize: true,
+        extra: {
+          options: '-c timezone=Asia/Dhaka',
+        },
       }),
     }),
 
-    // 3️⃣ MailerModule configure করা হলো Gmail SMTP দিয়ে
+    // 3️⃣ MailerModule configure (Gmail SMTP or custom)
     MailerModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         transport: {
           host: config.get('SMTP_HOST') || 'smtp.gmail.com',
           port: Number(config.get('SMTP_PORT') ?? 465),
-          secure: config.get('SMTP_SECURE') === 'true',  // SSL
+          secure: config.get('SMTP_SECURE') === 'true', // SSL
           ignoreTLS: config.get('SMTP_IGNORE_TLS') === 'true',
           auth: {
             user: config.get('SMTP_USER') || 'your_email@gmail.com',
@@ -48,14 +59,15 @@ import { OrdersModule } from './orders/orders.module';
       }),
     }),
 
-    // 4️⃣ Project modules import করা হলো
+    // 4️⃣ All feature modules
     CustomerModule,
     CustomerProfileModule,
     AuthenticationModule,
     EmailModule,
-    OrdersModule, // EmailService ব্যবহার করতে হলে import করতে হবে
+    OrdersModule,
+    AdminModule,
+    ManagerModule,
+    AuthModule,
   ],
-  //controllers: [],
-  //providers: [],
 })
 export class AppModule {}
