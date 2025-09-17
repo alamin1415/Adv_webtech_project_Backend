@@ -1,12 +1,10 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { jwtConstants } from './constants';
 import { AdminInfo } from 'src/admin/admin.entity';
 import { ManagerInfo } from 'src/manager/manager.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class AuthService {
@@ -19,7 +17,7 @@ export class AuthService {
   async signIn(username_or_email: string, password: string) {
   
   const admin = await this.adminRepo.findOne({ where: { fullname: username_or_email } });
- let role = 'Admin';
+  let role = 'Admin';
  //if no admin exists
  if(admin){
     const isPasswordValid = await bcrypt.compare(password, admin.password);
@@ -28,7 +26,7 @@ export class AuthService {
     }
  const payload = { sub: admin.id, username: admin.fullname,role }; // sub = userId conventionally
     return {
-      access_token: await this.jwtService.signAsync(payload),
+      access_token: await this.jwtService.signAsync(payload), //generate token with payload and secret
     }
  }
 
@@ -49,7 +47,7 @@ else if (!admin) {
     const payload={ sub: manager.id, email: manager.email, role};
 
     return {
-              access_token: await this.jwtService.signAsync(payload),
+              access_token: await this.jwtService.signAsync(payload),//encoding payload
     }
 
    }

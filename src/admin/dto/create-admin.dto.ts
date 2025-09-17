@@ -50,7 +50,6 @@ export class CreateAdminDto {
     message: 'Status must be either "active" or "inactive"',
   })
 
-  
    @IsOptional()
   status: 'active'| 'inactive';
 

@@ -3,7 +3,7 @@ import { OneToMany } from "typeorm";
 import { ManagerInfo } from "src/manager/manager.entity";
 
 @Entity("admininfo")
-export class AdminInfo{
+export class AdminInfo {
 
 @PrimaryGeneratedColumn({ type: 'int', unsigned: true})
 id: number;
@@ -17,7 +17,7 @@ age: number;
 @Column({nullable:true})
 password:string;
 
-@Column({ type: 'enum',
+@Column( { type: 'enum',
           enum: ['active', 'inactive'],
           default: 'active',  
 })
@@ -31,6 +31,7 @@ email: string;
 
 @OneToMany(() => ManagerInfo, manager => manager.admin)
 managers: ManagerInfo[];
+  admin: AdminInfo | PromiseLike<AdminInfo>;
 
 
 }

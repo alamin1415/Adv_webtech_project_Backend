@@ -7,7 +7,6 @@ import { jwtConstants } from './constants';
 import { AdminInfo } from '../admin/admin.entity';
 import { ManagerInfo } from '../manager/manager.entity';
 import { AuthGuard } from './auth.guard';
-import { MailerModule } from '@nestjs-modules/mailer';
 
 
 @Module({
@@ -16,7 +15,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
     JwtModule.register({
       global: true,
       secret: jwtConstants.secret,
-      signOptions: { expiresIn: '1h' },
+      signOptions: { expiresIn: '2h' },
     }),
   ],
   providers: [AuthService, AuthGuard], // AuthGuard include

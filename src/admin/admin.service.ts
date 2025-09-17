@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException} from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Admin, MoreThan, Repository } from "typeorm";
+import { MoreThan, Repository } from "typeorm";
 import { AdminInfo } from "./admin.entity";
 import { CreateAdminDto } from "./dto/create-admin.dto";
 import { UpdateAdminDto } from "./dto/updateadmin.dto";
@@ -8,21 +8,28 @@ import * as bcrypt from 'bcrypt'
 import { ManagerInfo } from "src/manager/manager.entity";
 import { CreateManagerDto } from "./dto/create-manager.dto";
 import { MailerService } from "@nestjs-modules/mailer";
+import { PusherService } from "src/pusher/pusher.service";
 
 @Injectable()
 export class AdminService{
 
+
    constructor(
     @InjectRepository(AdminInfo) private adminRepo: Repository<AdminInfo>,
     @InjectRepository(ManagerInfo) private managerRepo: Repository<ManagerInfo>,
+    private pusherService: PusherService,
     private mailerService:MailerService,
   ) {}
 
 
 async createAdmin(adminData: CreateAdminDto): Promise<AdminInfo> { //<AdminInfo> is the Type of one object
+    const existuser= await this.adminRepo.findOne({where :{fullname : adminData.fullname}});
+
+    if(existuser){
+      throw new BadRequestException('Username already exists. Please try another one.')
+    }
     return this.adminRepo.save(adminData);
    }
-
 
 async changeStatus(id: number, status: 'active' | 'inactive'): Promise<{message:string}>{
    const result = await this.adminRepo.update(id, { status });
@@ -95,23 +102,28 @@ async findByUsername(fullname: string): Promise<AdminInfo | null>{
  return `Admin with ID ${adminid} deleted successfully`;
 }
 
-//MANAGER
+///////////////MANAGER/////////////////////
 
-async CreateManager(adminid: number, managerData: CreateManagerDto){
+async CreateManager(adminid: number, managerData: CreateManagerDto) {
+  const admin = await this.adminRepo.findOne({where:{id: adminid}});
+  if (!admin) throw new NotFoundException('Admin not found');
 
-  const admin=await this.adminRepo.findOne({where:{id:adminid}});
-  if(!admin){
-    throw new NotFoundException('Admin not found');
-  }
+  const existsemail = await this.managerRepo.findOne({where: {email: managerData.email}});
+  if (existsemail) throw new BadRequestException('Email already exists.');
 
-  const existsemail= await this.managerRepo.findOne({where :{email : managerData.email}});
-  if(existsemail){
-    throw new BadRequestException('Email already exists. Please try another one.');
-  }
+  // Create & save manager first
+  const manager = this.managerRepo.create({ ...managerData, admin });
+  const savedManager = await this.managerRepo.save(manager);
 
-  const manager= await this.managerRepo.create({...managerData,admin});
-  return await this.managerRepo.save(manager);
+  // Trigger notification AFTER saving (don't await it to avoid blocking)
+this.pusherService.notifyManagerAdded(savedManager.fullname)
+  .then(() => console.log('Pusher notification sent'))
+  .catch(err => console.error('Pusher notification error:', err));
+
+
+  return savedManager;
 }
+
 
 async getManagersByAdminId(adminid: number): Promise <ManagerInfo[]> {
 
@@ -122,6 +134,40 @@ async getManagersByAdminId(adminid: number): Promise <ManagerInfo[]> {
   }
 return admin.managers; 
 }
+
+   // Dashboard Stats for Admin
+  async getDashboardStats(adminId: number) {
+    // total managers under this admin
+    const total = await this.managerRepo.count({
+      where: { admin: { id: adminId } },
+    });
+
+    // active managers
+    const active = await this.managerRepo.count({
+      where: { admin: { id: adminId }, status: 'active' },
+    }); 
+     // inactive managers
+    const inactive = await this.managerRepo.count({
+      where: { admin: { id: adminId }, status: 'inactive' },
+    });
+
+    // optionally: last 3 managers created
+    const recentManagers = await this.managerRepo.find({
+      where: { admin: { id: adminId } },
+      order: { created_at: 'DESC' },
+      take:3,
+    });
+
+  return {
+  stats: { total, active, inactive },
+  recentManagers: recentManagers.map((m) => ({  // creating new array of object with diff names
+    name: m.fullname,
+    email: m.email,
+    createdAt: m.created_at.toDateString(),
+  })),
+    
+   };
+  }
 
 async deleteManagerById(mid: number): Promise<string>{
 
@@ -134,6 +180,24 @@ async deleteManagerById(mid: number): Promise<string>{
  return `Manager with ID ${mid} deleted successfully`;
 }
 
+ // Fetch manager by ID
+  async getManagerById(id: number): Promise<ManagerInfo> {
+    const manager = await this.managerRepo.findOne({ where: { id } });
+
+    if (!manager) {
+      throw new NotFoundException(`Manager with ID ${id} not found`);
+    }
+
+    return manager;
+  }
+
+async getAdminByManagerId(managerid: number): Promise<AdminInfo>{
+  const manager= await this.managerRepo.findOne({where: {id:managerid}, relations: ['admin'],  });
+  if(!manager){
+        throw new NotFoundException('Manager Not Found');
+  }
+  return manager.admin;
+}
 
 //Sending mail
 async sendWelcomeEmail(toEmail: string, username: string) {
@@ -146,17 +210,7 @@ async sendWelcomeEmail(toEmail: string, username: string) {
 
 
 /*
- private admins:any[]= []; //in memory array
 
-getAdmin():object[] {
-    return this.admins;
-}
-
-addAdmin(admindata:object):object{
-   this.admins.push(admindata);
-   return {message: "Admin added Successfully" , admin:admindata};
-
-}
 getAdminByID(id: number): object {
     const admin = this.admins.find(a => {
     if (a == null) return false;

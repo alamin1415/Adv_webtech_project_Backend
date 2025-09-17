@@ -6,9 +6,11 @@ import { AdminInfo } from "./admin.entity";
 import { ManagerInfo } from "src/manager/manager.entity";
 import { AuthModule } from "src/auth/auth.module";
 import { MailerModule } from "@nestjs-modules/mailer";
+import { PusherModule } from "src/pusher/pusher.module";
 
 @Module({
     imports: [AuthModule, TypeOrmModule.forFeature([AdminInfo,ManagerInfo]),
+    PusherModule,
     MailerModule.forRoot({
       transport: {
         host: 'smtp.gmail.com',

@@ -5,7 +5,8 @@ import {Controller, Get, Query,
         BadRequestException,
         Put,
         NotFoundException,
-        UseGuards} from '@nestjs/common';
+        UseGuards,
+        Req} from '@nestjs/common';
 import {AdminService} from "./admin.service";
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -24,7 +25,7 @@ constructor(private readonly adminService:AdminService)
 {}
 
 //Create Admin
-@UseGuards(AuthGuard)
+//@UseGuards(AuthGuard)
 @Post('createadmin')
 @UsePipes(new ValidationPipe())
 @UseInterceptors(
@@ -108,7 +109,7 @@ async getAdminById(@Param('id',ParseIntPipe) id : number): Promise<AdminInfo>{
   return this.adminService.getAdminById(id);
 }
 
-//Update any data
+//Update Admins any data
 @UseGuards(AuthGuard)
 @Put('updateadmin/:id')
 @UseInterceptors(
@@ -145,11 +146,13 @@ async updateAdmin(
   return  this.adminService.updateAdmin(id, adminData);
 }
 
-
+//...........................................MANAGER.......................................//
 
   //MANAGERS ROUTES FOR ADMIN + CRUD
+  
+  //Create Manager
   @UseGuards(AuthGuard)
-  @Post('createmanager/:adminid')
+  @Post('createmanager')
 @UsePipes(new ValidationPipe())
 @UseInterceptors(
   FileInterceptor('file', {
@@ -169,10 +172,8 @@ async updateAdmin(
     }),
   }),
 )
-
-  @UseGuards(AuthGuard)
   async CreateManager(
-    @Param('adminid') adminid:number,
+    @Req() req: any,
     @Body() managerData:CreateManagerDto,
     @UploadedFile() file? : Express.Multer.File, 
   )
@@ -181,10 +182,11 @@ async updateAdmin(
     throw new BadRequestException('Image is required to create Admin');
   }
     (managerData as any).profile_picture = file.filename; 
-    const salt=await bcrypt.genSalt();
 
+    const salt=await bcrypt.genSalt();
     managerData.password= await bcrypt.hash(managerData.password,salt);
 
+    const adminid= req.user.sub; // retreive admin id from JWT token
    const manager= await this.adminService.CreateManager(adminid,managerData);
   
   // Send welcome email
@@ -195,16 +197,47 @@ async updateAdmin(
   }  
 
 
-  @UseGuards(AuthGuard)
-@Get('getmanager/:adminid')
-async getManagersByAdminId(@Param('adminid') adminid: number){
+@UseGuards(AuthGuard) 
+@Get('getmanagers')
+async getManagers(@Req() req) {
+  const adminId = req.user.sub; // Extract admin ID from JWT payload
+  const managers = await this.adminService.getManagersByAdminId(adminId);
 
-  const managers=await this.adminService.getManagersByAdminId(adminid);
-  if(!managers){
+  if (!managers || managers.length === 0) {
+    throw new NotFoundException('Managers not found.');
+  }
+
+  return managers;
+}
+
+//Fetching Data for Admin Dashboard for Recent activities
+  // New Dashboard Stats
+  @UseGuards(AuthGuard)
+  @Get('dashboard_stats')
+  async getDashboardStats(@Req() req) {
+    const adminId = req.user.sub;
+
+    return this.adminService.getDashboardStats(adminId);
+  }
+    // ✅ GET manager by ID
+  @UseGuards(AuthGuard)
+  @Get('getmanager/:id')
+  async getManagerById(@Param('id') id: string) {
+    return this.adminService.getManagerById(+id); // +id converts to number
+  }
+
+@UseGuards(AuthGuard)
+@Get('getadminbymanager/:managerid')
+async getAdminByManagerId(@Param('managerid', ParseIntPipe) managerid: number){
+
+  const admin=await this.adminService.getAdminByManagerId(managerid);
+  if(!admin){
     throw new NotFoundException('Admin or Manager not found');
   }
-return managers;
+return admin;
 }
+
+
 
   @UseGuards(AuthGuard)
 @Delete('deletemanager/:managerid')

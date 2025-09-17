@@ -15,6 +15,6 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @Get('profile')
   getProfile(@Request() req) {
-    return req.user; // req.user = token payload
+  return req.user; // return req.user = token payload
   }
 }

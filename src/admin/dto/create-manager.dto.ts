@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional, IsEmail, MinLength, Matches } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsEmail, MinLength, Matches, IS_LENGTH, MaxLength } from 'class-validator';
 
 export class CreateManagerDto {
   @IsString()
@@ -19,16 +19,21 @@ export class CreateManagerDto {
   @MinLength(6,{message: "Password must have atleast 6 characters"})
   password: string;
 
-  @IsOptional()
+ 
   @IsString()
-  phone?: string;
+  @IsNotEmpty({ message: 'Must give a phone number'})
+  @MinLength(9,{message:'Give a valid phone number'})
+  @MaxLength(14,{message:'Phone number can not be large than 14 digit'})
+  phone: string;
 
-  @IsOptional()
-  @IsString()
-  address?: string;
 
-  @IsOptional()
   @IsString()
+  @IsNotEmpty({message: 'Address field can not be empty'})
+  address: string;
+
+ //Already validated
+  @IsOptional()
+  @IsString({ message: 'filepath must be a string' })
   profile_picture?: string;
 
   @IsOptional()

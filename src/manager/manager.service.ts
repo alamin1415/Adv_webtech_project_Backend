@@ -1,15 +1,67 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ManagerInfo } from './manager.entity';
-import { AdminInfo } from 'src/admin/admin.entity';
+import { UpdateManagerDto } from './dto/update-manager.dto';
+import * as bcrypt from 'bcrypt'
+import { UpdateManagerPasswordDto } from './dto/updatepassword.dto';
 
 @Injectable()
 export class ManagerService {
+
   constructor(
     @InjectRepository(ManagerInfo) private managerRepo: Repository<ManagerInfo>,
-    @InjectRepository(AdminInfo) private adminRepo: Repository<AdminInfo>,
   ) {}
+
+async updateManager( mid: number,updateData:UpdateManagerDto): Promise <{message: string, updated: ManagerInfo}>{
+  const manager= await this.managerRepo.findOne({where: {id: mid} });
+
+  if(!manager){
+    throw new NotFoundException(`Manager with id ${mid} not found`);
+  }
+
+  if(updateData.password){ 
+     const salt=await bcrypt.genSalt();
+      updateData.password= await bcrypt.hash(updateData.password,salt);
+  }
+  
+  Object.assign(manager,updateData);
+  const updated= await this.managerRepo.save(manager);
+
+  return {message: 'Manager Updated Successfully', updated};
+}
+
+
+
+async UpdatePassword(mid: number, managerpasswords: UpdateManagerPasswordDto ): Promise<{message: string}>{
+
+const manager= await this.managerRepo.findOne({where: {id: mid} });
+if(!manager){
+  throw new NotFoundException(`Manager with id ${mid} not found`);
+}
+
+if(managerpasswords.prev_password==managerpasswords.newpassword){
+  throw new BadRequestException('Please give a new password to update');
+}
+
+const isMatch= await bcrypt.compare(managerpasswords.prev_password, manager.password);
+
+ if(isMatch){ //const isPasswordValid = await bcrypt.compare(password, admin.password);
+    const salt= await bcrypt.genSalt();
+
+   managerpasswords.newpassword = await bcrypt.hash(managerpasswords.newpassword, salt); }
+else{
+    throw new BadRequestException(`Previous password doesn't match`);
+  }
+  
+   manager.password = managerpasswords.newpassword;
+  await this.managerRepo.save(manager);
+
+  return ({message: `Manager password with Id ${mid} updated successfully`});
+
+}
+
+
 /*
   async createManager(managerData: CreateManagerDto, adminId: number): Promise<ManagerInfo> {
     const admin = await this.adminRepo.findOne({ where: { id: adminId } });
