@@ -56,6 +56,7 @@ export class AuthenticationService {
     const payload_service = {
       phone: customer.phone,
       name: customer.full_name,
+      sub: customer.id,
     };
 
     const token = await this.jwtService.signAsync(payload_service, {
@@ -67,6 +68,7 @@ export class AuthenticationService {
     return {
       message: 'Dear Customer you are successfully logged in',
       token: token,
+      customerId: customer.id,
     };
   }
 }

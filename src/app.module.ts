@@ -7,6 +7,7 @@ import { CustomerModule } from './customer/customer.module';
 import { CustomerProfileModule } from './customer_profile/customer_profile.module';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { EmailModule } from './email/email.module';
+import { OrdersModule } from './orders/orders.module';
 
 @Module({
   imports: [
@@ -51,7 +52,8 @@ import { EmailModule } from './email/email.module';
     CustomerModule,
     CustomerProfileModule,
     AuthenticationModule,
-    EmailModule, // EmailService ব্যবহার করতে হলে import করতে হবে
+    EmailModule,
+    OrdersModule, // EmailService ব্যবহার করতে হলে import করতে হবে
   ],
   //controllers: [],
   //providers: [],

@@ -1,89 +1,94 @@
-import { 
-  Delete, Controller, Get, Put, Post, ValidationPipe, Body, 
-  UseInterceptors, UploadedFile, Param, Patch, ParseIntPipe, 
-  UseGuards
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Post,
+  Put,
+  UseGuards,
+  ValidationPipe,
 } from '@nestjs/common';
-import { CreateCustomerDto } from './dtos/create_customer.dto';
+import { authorizeGuards } from 'src/authentication/guards/authorize.guards';
 import { customerService } from './customer.service';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { MulterError, diskStorage } from 'multer';
+import { CreateCustomerDto } from './dtos/create_customer.dto';
 import { UpdateCustomerDto } from './dtos/update_customer.dto';
 import { UpdateCustomerPutDto } from './dtos/update_customer_put.dto';
-import { authorizeGuards } from 'src/authentication/guards/authorize.guards';
 
 @Controller('customer')
 export class CustomerController {
   constructor(private customer_service: customerService) {}
-  
+
   //------------------------------------------------- GET METHODS ------------------------------------------------------------
-  @Get("all_customers")
+  @Get('all_customers')
   async getAllCustomers() {
     return await this.customer_service.getCustomerDetails();
   } //..................................................................
-  
+
   @Get('null')
   async getCustomersWithNullFullName() {
     return await this.customer_service.getCustomersWithNullFullName();
   } //..................................................................
-  
+
   @Get('track')
   TrackCustomerParcelById() {
     return 'Track All Customer Parcel successfully By Id';
   } //..................................................................
-  
+
   @Get('Details')
   getCustomerDetails() {
     return 'Customer details retrieved successfully';
   } //..................................................................
-  
+  @UseGuards(authorizeGuards)
   @Get('phone/:phone')
   async getCustomerByPhone(@Param('phone') phone: string) {
     return await this.customer_service.findCustomerByPhone(phone);
   } //..................................................................
-  
+
   @Get('id/:id')
   async getCustomerById(@Param('id', ParseIntPipe) id: number) {
     return await this.customer_service.getCustomerById(id);
   } //..................................................................
-  
+
   //------------------------------------------------- POST METHODS ------------------------------------------------------------
   @Post('add_customers')
   async createCustomer(
     @Body(new ValidationPipe({ whitelist: true, transform: true }))
-    customer: CreateCustomerDto
+    customer: CreateCustomerDto,
   ) {
     return await this.customer_service.createCustomer(customer);
-  } 
+  }
   //------------------------------------------------- PUT METHODS ------------------------------------------------------------
   @Put(':id')
   replaceCustomer(
     @Param('id', ParseIntPipe) id: number,
-    @Body(new ValidationPipe()) customer: UpdateCustomerPutDto
+    @Body(new ValidationPipe()) customer: UpdateCustomerPutDto,
   ) {
     return this.customer_service.replaceCustomer(id, customer);
   } //..................................................................
-  
+
   //------------------------------------------------- PATCH METHODS ------------------------------------------------------------
   @Patch(':id')
   async updateCustomerById(
-    @Param('id',ParseIntPipe) id: number,
-    @Body(new ValidationPipe()) customer: UpdateCustomerDto
+    @Param('id', ParseIntPipe) id: number,
+    @Body(new ValidationPipe()) customer: UpdateCustomerDto,
   ) {
     return await this.customer_service.updateCustomerById(+id, customer);
   } //..................................................................
-  
   @Patch('by-phone/:phone')
   async updateCustomerByPhone(
     @Param('phone') phone: string,
-    @Body(new ValidationPipe()) customer: UpdateCustomerDto
+    @Body(new ValidationPipe()) customer: UpdateCustomerDto,
   ) {
     return await this.customer_service.updateCustomerByPhone(phone, customer);
   } //..................................................................
-  
+
   //------------------------------------------------- DELETE METHODS ------------------------------------------------------------
   @Delete(':id')
   async deleteCustomerById(@Param('id') id: number) {
-    console.log("Deleting customer with ID: ${id}");
+    console.log('Deleting customer with ID: ${id}');
     return await this.customer_service.deleteCustomerById(+id);
   } //..................................................................
 }
